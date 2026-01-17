@@ -13,7 +13,13 @@ export class Tag {
   @PrimaryGeneratedColumn('increment', { name: 'id', type: 'bigint' })
   id: number;
 
-  @Column({ name: 'name', type: 'varchar', length: 150, nullable: false, unique: true })
+  @Column({
+    name: 'name',
+    type: 'varchar',
+    length: 150,
+    nullable: false,
+    unique: true,
+  })
   name: string;
 
   @ManyToMany(() => Article, (article) => article.tags)
