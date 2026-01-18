@@ -1,6 +1,6 @@
 import { compare } from 'bcrypt';
 
-export const validatePassword = async (
+export const validatePassword = (
   password: string,
   hashedPassword: string,
 ): Promise<boolean> => {

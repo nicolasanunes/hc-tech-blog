@@ -1,12 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
-import { ListLoginDto } from './dto/list-login.dto';
+import { ListLoginDto, LoginPayloadDto } from './dto/list-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { validatePassword } from 'src/utils/password';
-import { LoginPayloadDto } from './dto/login-payload.dto';
-import { ListUserDto } from 'src/users/dto/list-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -29,9 +27,17 @@ export class AuthService {
       throw new NotFoundException('E-mail e/ou senha inválidos!');
     }
 
+    const payload: LoginPayloadDto = {
+      id: user.id,
+      email: user.email,
+    };
+
     return {
-      accessToken: this.jwtService.sign({ ...new LoginPayloadDto(user) }),
-      user: new ListUserDto(user),
+      accessToken: this.jwtService.sign(payload),
+      user: {
+        name: user.name,
+        email: user.email,
+      },
     };
   }
 }

@@ -8,6 +8,7 @@ import { User } from './users/entities/user.entity';
 import { Tag } from './tags/entities/tag.entity';
 import { Article } from './articles/entities/article.entity';
 import { Comment } from './comments/entities/comment.entity';
+import { ArticlesModule } from './articles/articles.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { Comment } from './comments/entities/comment.entity';
     }),
     AuthModule,
     UsersModule,
+    ArticlesModule,
   ],
   controllers: [],
   providers: [],

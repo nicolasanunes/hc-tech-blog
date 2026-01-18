@@ -14,7 +14,7 @@ import { Article } from 'src/articles/entities/article.entity';
 export class Comment {
   @PrimaryGeneratedColumn('increment', { name: 'id', type: 'bigint' })
   id: number;
-  
+
   @Column({ name: 'content', type: 'longtext', nullable: false })
   content: string;
 
@@ -31,7 +31,7 @@ export class Comment {
   @ManyToOne(() => Article, { nullable: false })
   @JoinColumn({ name: 'article_id' })
   article: Article;
-  
+
   @Column({ name: 'parent_comment_id', type: 'bigint', nullable: true })
   parentCommentId: number;
 

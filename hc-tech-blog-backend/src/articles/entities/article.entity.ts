@@ -23,7 +23,12 @@ export class Article {
   @Column({ name: 'content', type: 'longtext', nullable: false })
   content: string;
 
-  @Column({ name: 'article_picture', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'article_picture',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   articlePicture: string;
 
   @Column({ name: 'author_id', type: 'bigint', nullable: false })

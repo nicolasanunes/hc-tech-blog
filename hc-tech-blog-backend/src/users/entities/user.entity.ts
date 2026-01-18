@@ -14,13 +14,24 @@ export class User {
   @Column({ name: 'name', type: 'varchar', length: 150, nullable: false })
   name: string;
 
-  @Column({ name: 'email', type: 'varchar', length: 255, unique: true, nullable: false })
+  @Column({
+    name: 'email',
+    type: 'varchar',
+    length: 255,
+    unique: true,
+    nullable: false,
+  })
   email: string;
 
   @Column({ name: 'password', type: 'varchar', length: 255, nullable: false })
   password: string;
 
-  @Column({ name: 'profile_picture', type: 'varchar', length: 500, nullable: true })
+  @Column({
+    name: 'profile_picture',
+    type: 'varchar',
+    length: 500,
+    nullable: true,
+  })
   profilePicture: string;
 
   @CreateDateColumn({ name: 'created_at' })
