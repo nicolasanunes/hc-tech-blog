@@ -1,3 +1,4 @@
+import { ListCommentsDto } from 'src/comments/dto/list-comments.dto';
 import { ListTagsDto } from 'src/tags/dto/list-tags.dto';
 import { ListAuthorDto } from 'src/users/dto/list-user.dto';
 
@@ -17,4 +18,9 @@ export class PaginatedArticlesDto {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+export class ArticleWithComments {
+  article: ListArticlesDto;
+  comments: ListCommentsDto[];
 }

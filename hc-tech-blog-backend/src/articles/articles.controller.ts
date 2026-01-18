@@ -1,8 +1,18 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Query,
+  UseGuards,
+} from '@nestjs/common';
 import { ArticlesService } from './articles.service';
 import { SearchArticlesDto } from './dto/search-articles.dto';
 import { AuthGuard } from '@nestjs/passport';
-import { PaginatedArticlesDto } from './dto/list-articles.dto';
+import {
+  ArticleWithComments,
+  PaginatedArticlesDto,
+} from './dto/list-articles.dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -14,5 +24,13 @@ export class ArticlesController {
     @Query() searchArticlesDto: SearchArticlesDto,
   ): Promise<PaginatedArticlesDto> {
     return this.articlesService.searchArticles(searchArticlesDto);
+  }
+
+  @Get(':id/article-with-comments')
+  @UseGuards(AuthGuard('jwt'))
+  async listArticleWithComments(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ArticleWithComments> {
+    return this.articlesService.listArticleWithComments(id);
   }
 }

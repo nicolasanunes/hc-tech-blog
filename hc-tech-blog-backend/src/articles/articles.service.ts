@@ -2,14 +2,20 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Article } from './entities/article.entity';
+import { Comment } from '../comments/entities/comment.entity';
 import { SearchArticlesDto } from './dto/search-articles.dto';
-import { PaginatedArticlesDto } from './dto/list-articles.dto';
+import {
+  ArticleWithComments,
+  PaginatedArticlesDto,
+} from './dto/list-articles.dto';
 
 @Injectable()
 export class ArticlesService {
   constructor(
     @InjectRepository(Article)
     private readonly articleRepository: Repository<Article>,
+    @InjectRepository(Comment)
+    private readonly commentsRepository: Repository<Comment>,
   ) {}
 
   async searchArticles(
@@ -71,6 +77,52 @@ export class ArticlesService {
       page,
       limit,
       totalPages,
+    };
+  }
+
+  async listArticleWithComments(id: number): Promise<ArticleWithComments> {
+    const article = await this.articleRepository.findOne({
+      where: { id },
+      relations: ['author', 'tags'],
+    });
+
+    if (!article) {
+      throw new Error('Artigo não encontrado');
+    }
+
+    const comments = await this.commentsRepository.find({
+      where: { article: { id: article.id } },
+      relations: ['author', 'parentComment'],
+      order: { createdAt: 'DESC' },
+    });
+
+    return {
+      article: {
+        id: article.id,
+        title: article.title,
+        content: article.content,
+        articlePicture: article.articlePicture,
+        author: {
+          id: article.author.id,
+          name: article.author.name,
+        },
+        tags: article.tags.map((tag) => ({
+          id: tag.id,
+          name: tag.name,
+        })),
+        createdAt: article.createdAt,
+      },
+      comments: comments.map((comment) => ({
+        id: comment.id,
+        content: comment.content,
+        createdAt: comment.createdAt,
+        parentComment: comment.parentComment,
+        author: {
+          id: comment.author.id,
+          name: comment.author.name,
+          profilePicture: comment.author.profilePicture,
+        },
+      })),
     };
   }
 }
