@@ -1,27 +1,46 @@
-import path from 'path'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
       path: '/',
       component: () => import('../views/HomeView.vue'),
-      meta: { title: 'Home' },
+      meta: { title: 'Home', requiresAuth: false },
   },
   {
     path: '/login',
     component: () => import('../views/LoginView.vue'),
-    meta: { title: 'Login' },
+    meta: { title: 'Login', requiresAuth: false },
   },
   {
     path: '/articles',
     component: () => import('../views/ArticlesView.vue'),
-    meta: { title: 'Articles' },
+    meta: { title: 'Articles', requiresAuth: true },
   }
 ]
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
+})
+
+// Navigation guard: protege rotas que precisam de autenticação
+router.beforeEach(async (to, from, next) => {
+  const authStore = useAuthStore()
+
+  if (!authStore.accessToken) {
+    authStore.initializeAuth()
+  }
+
+  const requiresAuth = to.meta.requiresAuth
+
+  if (requiresAuth && !authStore.isAuthenticated) {
+    next({ path: '/login', query: { redirect: to.fullPath } })
+  } else if (to.path === '/login' && authStore.isAuthenticated) {
+    next({ path: '/' })
+  } else {
+    next()
+  }
 })
 
 router.afterEach((to) => {

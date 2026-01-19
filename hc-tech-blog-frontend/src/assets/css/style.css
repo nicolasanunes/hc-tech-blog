@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+@theme {
+  --color-button-color: #67a22d;
+  --color-input-color: #edf2e8;
+}
+
 body {
   font-family: "Crimson Text", serif;
 }
