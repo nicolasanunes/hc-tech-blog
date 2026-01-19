@@ -9,6 +9,7 @@ import { CreateArticleDto } from './dto/create-article.dto';
 import { UpdateArticleDto } from './dto/update-article.dto';
 import {
   ArticleWithComments,
+  ListArticleDto,
   ListArticlesDto,
   PaginatedArticlesDto,
 } from './dto/list-articles.dto';
@@ -78,6 +79,28 @@ export class ArticlesService {
         name: articleWithRelations.author.name,
       },
       tags: articleWithRelations.tags.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })),
+    };
+  }
+
+  async listArticleById(id: number): Promise<ListArticleDto> {
+    const article = await this.articleRepository.findOne({
+      where: { id },
+      relations: ['tags'],
+    }); 
+    
+    if (!article) {
+      throw new NotFoundException('Artigo não encontrado');
+    }
+  
+    return {
+      id: article.id,
+      title: article.title,
+      content: article.content,
+      articlePicture: article.articlePicture,
+      tags: article.tags.map((tag) => ({
         id: tag.id,
         name: tag.name,
       })),

@@ -15,6 +15,7 @@ import { SearchArticlesDto } from './dto/search-articles.dto';
 import { AuthGuard } from '@nestjs/passport';
 import {
   ArticleWithComments,
+  ListArticleDto,
   ListArticlesDto,
   PaginatedArticlesDto,
 } from './dto/list-articles.dto';
@@ -33,6 +34,14 @@ export class ArticlesController {
   ): Promise<ListArticlesDto> {
     return this.articlesService.createArticle(createArticleDto, req.user.id);
   }
+  
+  @Get(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async listArticleById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<ListArticleDto> {
+    return this.articlesService.listArticleById(id);
+  } 
 
   @Get('search')
   @UseGuards(AuthGuard('jwt'))

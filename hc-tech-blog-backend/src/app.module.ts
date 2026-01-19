@@ -10,6 +10,7 @@ import { Article } from './articles/entities/article.entity';
 import { Comment } from './comments/entities/comment.entity';
 import { ArticlesModule } from './articles/articles.module';
 import { CommentsModule } from './comments/comments.module';
+import { TagsModule } from './tags/tags.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { CommentsModule } from './comments/comments.module';
     UsersModule,
     ArticlesModule,
     CommentsModule,
+    TagsModule,
   ],
   controllers: [],
   providers: [],
