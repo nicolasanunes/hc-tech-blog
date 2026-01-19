@@ -13,13 +13,13 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(login: LoginDto): Promise<ListLoginDto> {
+  async login(loginDto: LoginDto): Promise<ListLoginDto> {
     const user: User | undefined = await this.usersService
-      .listUserByEmail(login.email)
+      .listUserByEmail(loginDto.email)
       .catch(() => undefined);
 
     const isPasswordValid = await validatePassword(
-      login.password,
+      loginDto.password,
       user?.password || '',
     );
 
@@ -30,7 +30,7 @@ export class AuthService {
     const payload: LoginPayloadDto = {
       id: user.id,
       email: user.email,
-    };
+    }; 
 
     return {
       accessToken: this.jwtService.sign(payload),

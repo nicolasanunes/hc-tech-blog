@@ -8,7 +8,8 @@ export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post()
-  async login(@Body() login: LoginDto): Promise<ListLoginDto> {
-    return this.authService.login(login);
+  async login(@Body() loginDto: LoginDto): Promise<ListLoginDto> {
+    return this.authService.login(loginDto);
   }
 }
+ 

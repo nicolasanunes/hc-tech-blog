@@ -4,6 +4,7 @@ import {
   Get,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Query,
   Request,
@@ -18,6 +19,7 @@ import {
   PaginatedArticlesDto,
 } from './dto/list-articles.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 
 @Controller('articles')
 export class ArticlesController {
@@ -47,4 +49,14 @@ export class ArticlesController {
   ): Promise<ArticleWithComments> {
     return this.articlesService.listArticleWithComments(id);
   }
-}
+
+  @Patch(':id')
+  @UseGuards(AuthGuard('jwt'))
+  async updateArticle(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updateArticleDto: UpdateArticleDto,
+    @Request() req: any,
+  ): Promise<ListArticlesDto> {
+    return this.articlesService.updateArticle(id, updateArticleDto, req.user.id);
+  }
+} 

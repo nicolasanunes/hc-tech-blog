@@ -6,6 +6,7 @@ import { Comment } from '../comments/entities/comment.entity';
 import { Tag } from '../tags/entities/tag.entity';
 import { SearchArticlesDto } from './dto/search-articles.dto';
 import { CreateArticleDto } from './dto/create-article.dto';
+import { UpdateArticleDto } from './dto/update-article.dto';
 import {
   ArticleWithComments,
   ListArticlesDto,
@@ -190,4 +191,79 @@ export class ArticlesService {
       })),
     };
   }
+
+  async updateArticle(
+    id: number,
+    updateArticleDto: UpdateArticleDto,
+    userId: number,
+  ): Promise<ListArticlesDto> {
+    // Busca o artigo
+    const article = await this.articleRepository.findOne({
+      where: { id },
+      relations: ['author', 'tags'],
+    });
+
+    if (!article) {
+      throw new NotFoundException('Artigo não encontrado');
+    }
+
+    // Verifica se o usuário é o autor do artigo
+    if (article.authorId !== userId) {
+      throw new BadRequestException('Você não tem permissão para editar este artigo');
+    }
+
+    const { title, content, articlePicture, tagIds } = updateArticleDto;
+
+    // Atualiza os campos e != de undefined
+    if (title !== undefined) article.title = title;
+    if (content !== undefined) article.content = content;
+    if (articlePicture !== undefined) article.articlePicture = articlePicture;
+
+    // Atualiza as tags
+    if (tagIds !== undefined) {
+      if (tagIds.length > 0) {
+        const tags = await this.tagRepository.find({
+          where: { id: In(tagIds) },
+        });
+
+        if (tags.length !== tagIds.length) {
+          throw new BadRequestException('Uma ou mais tags não foram encontradas');
+        }
+
+        article.tags = tags;
+      } else {
+        article.tags = [];
+      }
+    }
+
+    // Salva as alterações no banco de dados
+    await this.articleRepository.save(article);
+
+    // Retorna o artigo atualizado com todas as relações
+    const updatedArticle = await this.articleRepository.findOne({
+      where: { id },
+      relations: ['author', 'tags'],
+    });
+
+    if (!updatedArticle) {
+      throw new NotFoundException('Erro ao atualizar o artigo');
+    }
+
+    return {
+      id: updatedArticle.id,
+      title: updatedArticle.title,
+      content: updatedArticle.content,
+      articlePicture: updatedArticle.articlePicture,
+      createdAt: updatedArticle.createdAt,
+      author: {
+        id: updatedArticle.author.id,
+        name: updatedArticle.author.name,
+      },
+      tags: updatedArticle.tags.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })),
+    };
+  }
 }
+ 
