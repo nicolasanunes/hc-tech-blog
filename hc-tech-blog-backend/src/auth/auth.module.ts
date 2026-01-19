@@ -14,7 +14,7 @@ import { JwtStrategy } from './jwt.strategy';
         return {
           secret: process.env.JWT_SECRET!,
           signOptions: {
-            expiresIn: '7d',
+            expiresIn: '15m', // Access token expira em 15 minutos
           },
         };
       },

@@ -1,3 +1,4 @@
+import path from 'path'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const routes = [
@@ -10,6 +11,11 @@ const routes = [
     path: '/login',
     component: () => import('../views/LoginView.vue'),
     meta: { title: 'Login' },
+  },
+  {
+    path: '/articles',
+    component: () => import('../views/ArticlesView.vue'),
+    meta: { title: 'Articles' },
   }
 ]
 
@@ -19,7 +25,7 @@ const router = createRouter({
 })
 
 router.afterEach((to) => {
-  const baseTitle = 'Tech Blog'
+  const baseTitle = 'TechBlog'
   const pageTitle = to.meta.title as string
   document.title = pageTitle ? `${baseTitle} | ${pageTitle}` : baseTitle
 })
