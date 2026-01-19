@@ -124,18 +124,23 @@ const toggleTag = (tagId: number) => {
       </div>
     </div>
 
-    <button
-      class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4"
-    >
-      Criar Artigo
-    </button>
+    <RouterLink to="/create-article" class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4">
+      Criar artigo
+    </RouterLink>
 
     <div class="grid grid-cols-1 gap-4">
       <div v-for="article in articlesArray?.data" :key="article.id">
         <div class="flex flex-row">
           <div class="flex-shrink-0 mr-4">
             <img
+              v-if="article.articlePicture"
               :src="article.articlePicture"
+              :alt="article.title"
+              class="w-22 h-22 object-cover rounded-xl"
+            />
+            <img
+              v-else
+              src="https://plus.unsplash.com/premium_vector-1718631069909-d1a5091a56ae?q=80&w=880&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
               :alt="article.title"
               class="w-22 h-22 object-cover rounded-xl"
             />

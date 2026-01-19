@@ -20,6 +20,12 @@ const routes = [
     component: () => import('../views/ArticlesView.vue'),
     meta: { title: 'Artigos', requiresAuth: true },
   },
+  {
+    path: '/create-article',
+    name: 'create-article',
+    component: () => import('../views/CreateArticleView.vue'),
+    meta: { title: 'Criar Artigo', requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

@@ -29,3 +29,10 @@ export interface SearchArticlesParams {
   page?: number;
   limit?: number;
 }
+
+export interface CreateArticleParams {
+  title: string;
+  content: string;
+  tagIds: number[];
+  articlePicture?: string;
+}

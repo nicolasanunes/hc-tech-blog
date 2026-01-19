@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import type { AuthResponse, RefreshTokenRequest } from '@/types/auth';
 import type { Tag } from '@/types/tag';
-import type { PaginatedArticles, SearchArticlesParams } from '@/types/article';
+import type { Article, PaginatedArticles, SearchArticlesParams } from '@/types/article';
 
 // Cria instância do axios com configuração base
 const api: AxiosInstance = axios.create({
@@ -125,15 +125,27 @@ api.interceptors.response.use(
   }
 );
 
-// API de Tags
+// API de listar as tags
 export const getTags = async (): Promise<Tag[]> => {
   const response = await api.get<Tag[]>('/tags');
   return response.data;
 };
 
-// API de Articles
+// API de criar uma nova ta
+export const createTag = async (name: string): Promise<Tag> => {
+  const response = await api.post<Tag>('/tags', { name });
+  return response.data;
+};
+
+// API de listar artigos
 export const searchArticles = async (params?: SearchArticlesParams): Promise<PaginatedArticles> => {
   const response = await api.get<PaginatedArticles>('/articles/search', { params });
+  return response.data;
+};
+
+// API de criar artigo
+export const createArticle = async (params: { title: string; content: string; tagIds: number[]; articlePicture?: string }): Promise<Article> => {
+  const response = await api.post<Article>('/articles', params);
   return response.data;
 };
 
