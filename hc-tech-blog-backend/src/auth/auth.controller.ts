@@ -14,8 +14,9 @@ export class AuthController {
   }
 
   @Post('refresh-token')
-  async refreshToken(@Body() refreshTokenDto: RefreshTokenDto): Promise<ListLoginDto> {
+  async refreshToken(
+    @Body() refreshTokenDto: RefreshTokenDto,
+  ): Promise<ListLoginDto> {
     return this.authService.refreshToken(refreshTokenDto);
   }
 }
- 

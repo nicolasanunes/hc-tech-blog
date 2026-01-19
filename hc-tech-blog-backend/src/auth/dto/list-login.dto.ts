@@ -1,5 +1,4 @@
 import { ListAuthUserDto } from 'src/users/dto/list-user.dto';
-import { RefreshTokenDto } from './refresh-token.dto';
 
 export class ListLoginDto {
   user: ListAuthUserDto;

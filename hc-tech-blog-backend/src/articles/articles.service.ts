@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Article } from './entities/article.entity';
@@ -24,8 +28,11 @@ export class ArticlesService {
     @InjectRepository(Tag)
     private readonly tagRepository: Repository<Tag>,
   ) {}
- 
-  async createArticle(createArticleDto: CreateArticleDto, authorId: number): Promise<ListArticlesDto> {
+
+  async createArticle(
+    createArticleDto: CreateArticleDto,
+    authorId: number,
+  ): Promise<ListArticlesDto> {
     const { title, content, articlePicture, tagIds } = createArticleDto;
 
     // Valida se as tags existem
@@ -67,7 +74,7 @@ export class ArticlesService {
     if (!articleWithRelations) {
       throw new NotFoundException('Erro ao criar o artigo');
     }
- 
+
     return {
       id: articleWithRelations.id,
       title: articleWithRelations.title,
@@ -89,12 +96,12 @@ export class ArticlesService {
     const article = await this.articleRepository.findOne({
       where: { id },
       relations: ['tags'],
-    }); 
-    
+    });
+
     if (!article) {
       throw new NotFoundException('Artigo não encontrado');
     }
-  
+
     return {
       id: article.id,
       title: article.title,
@@ -110,7 +117,7 @@ export class ArticlesService {
   async searchArticles(
     searchArticlesDto: SearchArticlesDto,
   ): Promise<PaginatedArticlesDto> {
-    const { title, tagIds, page = 1, limit = 6 } = searchArticlesDto;
+    const { title, tagIds, page = 1, limit = 5 } = searchArticlesDto;
 
     const queryBuilder = this.articleRepository
       .createQueryBuilder('article')
@@ -232,7 +239,9 @@ export class ArticlesService {
 
     // Verifica se o usuário é o autor do artigo
     if (article.authorId !== userId) {
-      throw new BadRequestException('Você não tem permissão para editar este artigo');
+      throw new BadRequestException(
+        'Você não tem permissão para editar este artigo',
+      );
     }
 
     const { title, content, articlePicture, tagIds } = updateArticleDto;
@@ -250,7 +259,9 @@ export class ArticlesService {
         });
 
         if (tags.length !== tagIds.length) {
-          throw new BadRequestException('Uma ou mais tags não foram encontradas');
+          throw new BadRequestException(
+            'Uma ou mais tags não foram encontradas',
+          );
         }
 
         article.tags = tags;
@@ -289,4 +300,3 @@ export class ArticlesService {
     };
   }
 }
- 

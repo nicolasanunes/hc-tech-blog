@@ -1,11 +1,16 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import type { AuthResponse, RefreshTokenRequest } from '@/types/auth';
+import type { Tag } from '@/types/tag';
+import type { PaginatedArticles, SearchArticlesParams } from '@/types/article';
 
 // Cria instância do axios com configuração base
 const api: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   headers: {
     'Content-Type': 'application/json',
+  },
+  paramsSerializer: {
+    indexes: null, // Para arrays: ?tagIds=1&tagIds=2 ao invés de ?tagIds[0]=1&tagIds[1]=2
   },
 });
 
@@ -119,5 +124,17 @@ api.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+// API de Tags
+export const getTags = async (): Promise<Tag[]> => {
+  const response = await api.get<Tag[]>('/tags');
+  return response.data;
+};
+
+// API de Articles
+export const searchArticles = async (params?: SearchArticlesParams): Promise<PaginatedArticles> => {
+  const response = await api.get<PaginatedArticles>('/articles/search', { params });
+  return response.data;
+};
 
 export default api;

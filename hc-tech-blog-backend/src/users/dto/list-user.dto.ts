@@ -1,4 +1,5 @@
 export class ListAuthUserDto {
+  id: number;
   email: string;
   name: string;
 }

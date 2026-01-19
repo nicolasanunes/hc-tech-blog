@@ -1,0 +1,31 @@
+import type { Tag } from './tag';
+
+export interface Author {
+  id: number;
+  name: string;
+}
+
+export interface Article {
+  id: number;
+  title: string;
+  content: string;
+  articlePicture: string;
+  author: Author;
+  createdAt: string;
+  tags: Tag[];
+}
+
+export interface PaginatedArticles {
+  data: Article[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface SearchArticlesParams {
+  title?: string;
+  tagIds?: number[];
+  page?: number;
+  limit?: number;
+}

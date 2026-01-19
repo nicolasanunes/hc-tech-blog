@@ -13,8 +13,8 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="flex justify-between items-center p-6 border border-gray-300">
-    <RouterLink to="/" class="font-bold text-xl">TechBlog</RouterLink>
+  <div class="flex justify-between items-center p-6 border-b border-gray-300">
+    <RouterLink :to="authStore.isAuthenticated ? '/articles' : '/'" class="font-bold text-xl">TechBlog</RouterLink>
 
     <button
       v-if="authStore.isAuthenticated && route.path !== '/login' && route.path !== '/'"

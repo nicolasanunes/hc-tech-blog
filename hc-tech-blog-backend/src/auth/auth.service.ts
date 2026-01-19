@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './dto/login.dto';
 import { ListLoginDto, LoginPayloadDto } from './dto/list-login.dto';
@@ -31,12 +35,13 @@ export class AuthService {
     const payload: LoginPayloadDto = {
       id: user.id,
       email: user.email,
-    }; 
+    };
 
     return {
       accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
       refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
       user: {
+        id: user.id,
         name: user.name,
         email: user.email,
       },
@@ -46,7 +51,9 @@ export class AuthService {
   async refreshToken(refreshToken: RefreshTokenDto): Promise<ListLoginDto> {
     try {
       // Verifica e decodifica o refresh token
-      const payload = this.jwtService.verify<LoginPayloadDto>(refreshToken.refreshToken);
+      const payload = this.jwtService.verify<LoginPayloadDto>(
+        refreshToken.refreshToken,
+      );
 
       // Valida se o usuário existe e está ativo
       const user: User = await this.usersService.findUserById(payload.id);
@@ -65,6 +72,7 @@ export class AuthService {
         accessToken: this.jwtService.sign(newPayload, { expiresIn: '15m' }),
         refreshToken: this.jwtService.sign(newPayload, { expiresIn: '7d' }),
         user: {
+          id: user.id,
           name: user.name,
           email: user.email,
         },
