@@ -1,11 +1,14 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { Article } from './entities/article.entity';
 import { Comment } from '../comments/entities/comment.entity';
+import { Tag } from '../tags/entities/tag.entity';
 import { SearchArticlesDto } from './dto/search-articles.dto';
+import { CreateArticleDto } from './dto/create-article.dto';
 import {
   ArticleWithComments,
+  ListArticlesDto,
   PaginatedArticlesDto,
 } from './dto/list-articles.dto';
 
@@ -16,7 +19,69 @@ export class ArticlesService {
     private readonly articleRepository: Repository<Article>,
     @InjectRepository(Comment)
     private readonly commentsRepository: Repository<Comment>,
+    @InjectRepository(Tag)
+    private readonly tagRepository: Repository<Tag>,
   ) {}
+ 
+  async createArticle(createArticleDto: CreateArticleDto, authorId: number): Promise<ListArticlesDto> {
+    const { title, content, articlePicture, tagIds } = createArticleDto;
+
+    // Valida se as tags existem
+    if (tagIds && tagIds.length > 0) {
+      const tags = await this.tagRepository.find({
+        where: { id: In(tagIds) },
+      });
+
+      if (tags.length !== tagIds.length) {
+        throw new BadRequestException('Uma ou mais tags não foram encontradas');
+      }
+    }
+
+    // Cria o artigo
+    const newArticle = this.articleRepository.create({
+      title,
+      content,
+      articlePicture,
+      authorId,
+    });
+
+    const savedArticle = await this.articleRepository.save(newArticle);
+
+    // Associa as tags
+    if (tagIds && tagIds.length > 0) {
+      const tags = await this.tagRepository.find({
+        where: { id: In(tagIds) },
+      });
+      savedArticle.tags = tags;
+      await this.articleRepository.save(savedArticle);
+    }
+
+    // Retorna o artigo com todas as relações
+    const articleWithRelations = await this.articleRepository.findOne({
+      where: { id: savedArticle.id },
+      relations: ['author', 'tags'],
+    });
+
+    if (!articleWithRelations) {
+      throw new NotFoundException('Erro ao criar o artigo');
+    }
+ 
+    return {
+      id: articleWithRelations.id,
+      title: articleWithRelations.title,
+      content: articleWithRelations.content,
+      articlePicture: articleWithRelations.articlePicture,
+      createdAt: articleWithRelations.createdAt,
+      author: {
+        id: articleWithRelations.author.id,
+        name: articleWithRelations.author.name,
+      },
+      tags: articleWithRelations.tags.map((tag) => ({
+        id: tag.id,
+        name: tag.name,
+      })),
+    };
+  }
 
   async searchArticles(
     searchArticlesDto: SearchArticlesDto,
