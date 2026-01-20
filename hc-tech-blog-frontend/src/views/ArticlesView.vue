@@ -121,7 +121,7 @@ const toggleTag = (tagId: number) => {
         @click="toggleTag(tag.id)"
         :class="[
           'bg-input-color text-black px-3 py-1 rounded-full text-sm cursor-pointer select-none',
-          selectedTagIds.includes(tag.id) ? 'border border-button-color' : '',
+          selectedTagIds.includes(tag.id) ? 'border border-button-color text-button-color' : '',
         ]"
       >
         {{ tag.name }}
@@ -206,7 +206,10 @@ const toggleTag = (tagId: number) => {
           </button>
         </div>
       </div>
-      <div v-if="articlesArray?.total === 0" class="text-center text-gray-600 flex flex-col items-center">
+      <div
+        v-if="articlesArray?.total === 0"
+        class="text-center text-gray-600 flex flex-col items-center"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="24"
@@ -218,11 +221,11 @@ const toggleTag = (tagId: number) => {
           stroke-linecap="round"
           stroke-linejoin="round"
           class="lucide lucide-frown-icon lucide-frown mb-2"
-          >
-          <circle cx="12" cy="12" r="10"/>
-          <path d="M16 16s-1.5-2-4-2-4 2-4 2"/>
-          <line x1="9" x2="9.01" y1="9" y2="9"/>
-          <line x1="15" x2="15.01" y1="9" y2="9"/>
+        >
+          <circle cx="12" cy="12" r="10" />
+          <path d="M16 16s-1.5-2-4-2-4 2-4 2" />
+          <line x1="9" x2="9.01" y1="9" y2="9" />
+          <line x1="15" x2="15.01" y1="9" y2="9" />
         </svg>
         Nenhum artigo encontrado
       </div>

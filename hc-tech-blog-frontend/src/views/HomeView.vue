@@ -6,8 +6,8 @@ const authStore = useAuthStore()
 
 <template>
   <div class="flex flex-col h-full justify-center text-center items-center gap-4">
-    <p class="text-5xl font-bold lg:text-6xl">Insights & Learning</p>
-    <p>
+    <p class="text-5xl font-bold lg:text-8xl">Insights & Learning</p>
+    <p class="lg:text-3xl">
       Exporando tendências Tech, <br class="md:hidden"/>
       um post por vez
     </p>

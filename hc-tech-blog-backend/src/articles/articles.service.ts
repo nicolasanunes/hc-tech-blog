@@ -32,7 +32,7 @@ export class ArticlesService {
   async createArticle(
     createArticleDto: CreateArticleDto,
     authorId: number,
-  ): Promise<ListArticlesDto> {
+  ): Promise<ListArticleDto> {
     const { title, content, articlePicture, tagIds } = createArticleDto;
 
     // Valida se as tags existem
@@ -95,7 +95,7 @@ export class ArticlesService {
   async listArticleById(id: number): Promise<ListArticleDto> {
     const article = await this.articleRepository.findOne({
       where: { id },
-      relations: ['tags'],
+      relations: ['tags', 'author'],
     });
 
     if (!article) {
@@ -107,6 +107,11 @@ export class ArticlesService {
       title: article.title,
       content: article.content,
       articlePicture: article.articlePicture,
+      createdAt: article.createdAt,
+      author: {
+        id: article.author.id,
+        name: article.author.name,
+      },
       tags: article.tags.map((tag) => ({
         id: tag.id,
         name: tag.name,

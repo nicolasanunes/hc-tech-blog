@@ -31,7 +31,7 @@ export class ArticlesController {
   async createArticle(
     @Body() createArticleDto: CreateArticleDto,
     @Request() req: any,
-  ): Promise<ListArticlesDto> {
+  ): Promise<ListArticleDto> {
     return this.articlesService.createArticle(createArticleDto, req.user.id);
   }
 
@@ -42,14 +42,14 @@ export class ArticlesController {
   ): Promise<PaginatedArticlesDto> {
     return this.articlesService.searchArticles(searchArticlesDto);
   }
-  
+
   @Get(':id')
   @UseGuards(AuthGuard('jwt'))
   async listArticleById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<ListArticleDto> {
     return this.articlesService.listArticleById(id);
-  } 
+  }
 
   @Get(':id/article-with-comments')
   @UseGuards(AuthGuard('jwt'))
@@ -66,7 +66,10 @@ export class ArticlesController {
     @Body() updateArticleDto: UpdateArticleDto,
     @Request() req: any,
   ): Promise<ListArticlesDto> {
-    return this.articlesService.updateArticle(id, updateArticleDto, req.user.id);
+    return this.articlesService.updateArticle(
+      id,
+      updateArticleDto,
+      req.user.id,
+    );
   }
-} 
- 
+}

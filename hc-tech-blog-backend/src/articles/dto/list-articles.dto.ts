@@ -7,8 +7,10 @@ export class ListArticleDto {
   title: string;
   content: string;
   articlePicture: string;
+  createdAt: Date;
+  author: ListAuthorDto;
   tags: ListTagsDto[];
-} 
+}
 
 export class ListArticlesDto {
   id: number;

@@ -1,5 +1,5 @@
-import { IsString, IsNotEmpty, IsArray, IsOptional } from '@nestjs/class-validator';
- 
+import { IsString, IsArray, IsOptional } from '@nestjs/class-validator';
+
 export class UpdateArticleDto {
   @IsString()
   @IsOptional()

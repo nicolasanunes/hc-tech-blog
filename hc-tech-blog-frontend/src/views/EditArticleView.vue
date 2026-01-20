@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { getTags, createTag, getArticle, updateArticle } from '@/services/api';
-import { useAuthStore } from '@/stores/auth';
-import type { Tag } from '@/types/tag';
-import { onMounted, ref, computed } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import ApiMessage from '@/components/ApiMessage.vue';
+import { getTags, createTag, getArticle, updateArticle } from '@/services/api'
+import { useAuthStore } from '@/stores/auth'
+import type { Tag } from '@/types/tag'
+import { onMounted, ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import ApiMessage from '@/components/ApiMessage.vue'
 
-const authStore = useAuthStore();
-const router = useRouter();
-const route = useRoute();
+const authStore = useAuthStore()
+const router = useRouter()
+const route = useRoute()
 
 const loading = ref(false)
 const errorMessage = ref<string>('')
@@ -27,10 +27,13 @@ const newTagName = ref('')
 const pendingTags = ref<string[]>([])
 
 const isFormValid = computed(() => {
+  // Verifica se há pelo menos um campo preenchido
   return (
-    title.value.trim() !== '' &&
-    content.value.trim() !== '' &&
-    (selectedTagIds.value.length > 0 || pendingTags.value.length > 0)
+    title.value.trim() !== '' ||
+    content.value.trim() !== '' ||
+    articlePicture.value.trim() !== '' ||
+    selectedTagIds.value.length > 0 ||
+    pendingTags.value.length > 0
   )
 })
 
@@ -58,14 +61,28 @@ const editArticle = async () => {
     // Combina tags selecionadas com tags recém criadas
     const allTagIds = [...selectedTagIds.value, ...createdTagIds]
 
-    const articleData: { title: string; content: string; tagIds: number[]; articlePicture?: string } = {
-      title: title.value.trim(),
-      content: content.value.trim(),
-      tagIds: allTagIds,
+    // Envia apenas os campos que estão preenchidos
+    const articleData: {
+      title?: string
+      content?: string
+      tagIds?: number[]
+      articlePicture?: string
+    } = {}
+
+    if (title.value.trim() !== '') {
+      articleData.title = title.value.trim()
     }
 
-    if (articlePicture.value.trim()) {
+    if (content.value.trim() !== '') {
+      articleData.content = content.value.trim()
+    }
+
+    if (articlePicture.value.trim() !== '') {
       articleData.articlePicture = articlePicture.value.trim()
+    }
+
+    if (allTagIds.length > 0) {
+      articleData.tagIds = allTagIds
     }
 
     const articleId = route.params.id as string
@@ -113,7 +130,7 @@ const fetchArticle = async () => {
     articlePicture.value = article.articlePicture || ''
 
     // Seleciona as tags atuais do artigo
-    selectedTagIds.value = article.tags.map(tag => tag.id)
+    selectedTagIds.value = article.tags.map((tag) => tag.id)
   } catch (err: any) {
     errorMessage.value = err.response?.data?.message || 'Erro ao carregar artigo'
     console.error('Erro ao buscar artigo:', err)
@@ -182,10 +199,8 @@ onMounted(() => {
       :loading-message="authStore.loading ? 'Editando...' : undefined"
       :success-message="successMessage"
     />
-    <p class="text-4xl font-semibold mb-2">
-      Editar artigo
-    </p>
-    <p class="font-semibold">Título do artigo *</p>
+    <p class="text-4xl font-semibold mb-2">Editar artigo</p>
+    <p class="font-semibold">Título do artigo</p>
     <input
       id="title"
       v-model="title"
@@ -194,7 +209,7 @@ onMounted(() => {
       placeholder="Título"
       :disabled="authStore.loading"
       @keyup.enter="editArticle"
-    >
+    />
     <p class="font-semibold">Imagem do artigo</p>
     <input
       id="articlePicture"
@@ -204,8 +219,8 @@ onMounted(() => {
       placeholder="URL da imagem"
       :disabled="authStore.loading"
       @keyup.enter="editArticle"
-    >
-    <p class="font-semibold">Tags *</p>
+    />
+    <p class="font-semibold">Tags</p>
     <div class="flex flex-wrap gap-2 mb-2">
       <div
         v-for="tag in tagsArray"
@@ -213,7 +228,7 @@ onMounted(() => {
         @click="toggleTag(tag.id)"
         :class="[
           'bg-input-color text-black px-3 py-1 rounded-full text-sm select-none',
-          selectedTagIds.includes(tag.id) ? 'border border-button-color' : '',
+          selectedTagIds.includes(tag.id) ? 'border border-button-color text-button-color' : '',
         ]"
       >
         {{ tag.name }}
@@ -238,7 +253,7 @@ onMounted(() => {
         v-else
         v-model="newTagName"
         type="text"
-        :style="{ width: (newTagName.length > 0 ? (newTagName.length + 3 + 'ch') : 6 + 'ch')}"
+        :style="{ width: newTagName.length > 0 ? newTagName.length + 3 + 'ch' : 6 + 'ch' }"
         class="bg-input-color px-3 py-1 rounded-full text-sm outline-none"
         placeholder="tag"
         @blur="saveNewTag"
@@ -248,7 +263,7 @@ onMounted(() => {
       />
     </div>
 
-    <p class="font-semibold">Conteúdo *</p>
+    <p class="font-semibold">Conteúdo</p>
     <textarea
       id="content"
       v-model="content"
@@ -257,9 +272,16 @@ onMounted(() => {
       placeholder="Escreva aqui seu artigo..."
       :disabled="authStore.loading"
     ></textarea>
-    <div class="flex flex-col lg:flex-row lg:justify-end lg:items-center lg:gap-2 lg:absolute lg:top-0 lg:right-0">
-      <p v-if="!isFormValid" class="text-red-500 text-xs lg:order-1">Preencha todas as informações obrigatórias *</p>
-      <button class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50 lg:order-2" @click="editArticle" :disabled="!isFormValid || authStore.loading || loading">Salvar</button>
+    <div
+      class="flex flex-col lg:flex-row lg:justify-end lg:items-center lg:gap-2 lg:absolute lg:top-0 lg:right-0"
+    >
+      <button
+        class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50"
+        @click="editArticle"
+        :disabled="!isFormValid || authStore.loading || loading"
+      >
+        Salvar
+      </button>
     </div>
   </div>
 </template>
