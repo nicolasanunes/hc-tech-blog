@@ -21,6 +21,12 @@ const routes = [
     meta: { title: 'Artigos', requiresAuth: true },
   },
   {
+    path: '/articles/:id',
+    name: 'article',
+    component: () => import('../views/ArticleView.vue'),
+    meta: { title: 'Artigo', requiresAuth: true },
+  },
+  {
     path: '/create-article',
     name: 'create-article',
     component: () => import('../views/CreateArticleView.vue'),

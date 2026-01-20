@@ -130,7 +130,7 @@ const toggleTag = (tagId: number) => {
 
     <div class="grid grid-cols-1 gap-4">
       <div v-for="article in articlesArray?.data" :key="article.id">
-        <div class="flex flex-row">
+        <div class="flex flex-row" @click="$router.push(`/articles/${article.id}`)">
           <div class="flex-shrink-0 mr-4">
             <img
               v-if="article.articlePicture"

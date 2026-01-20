@@ -181,7 +181,7 @@ onMounted(() => {
       @keyup.enter="createArticle"
     >
     <p class="font-semibold">Tags *</p>
-    <div class="flex flex-wrap gap-2 mb-4">
+    <div class="flex flex-wrap gap-2 mb-2">
       <div
         v-for="tag in tagsArray"
         :key="tag.id"

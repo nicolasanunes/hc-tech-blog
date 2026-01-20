@@ -3,6 +3,30 @@ import type { Tag } from './tag';
 export interface Author {
   id: number;
   name: string;
+  profilePicture?: string;
+}
+
+export interface ParentComment {
+  id: string;
+  content: string;
+  authorId: string;
+  articleId: string;
+  parentCommentId: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  createdAt: string;
+  parentComment: ParentComment | null;
+  author: Author;
+}
+
+export interface ArticleWithComments {
+  article: Article;
+  comments: Comment[];
 }
 
 export interface Article {

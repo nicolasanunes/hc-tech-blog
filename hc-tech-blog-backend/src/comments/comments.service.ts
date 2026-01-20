@@ -93,5 +93,39 @@ export class CommentsService {
         : null,
     };
   }
+
+  async deleteComment(commentId: number, authorId: number): Promise<void> {
+    const comment = await this.commentsRepository.findOne({
+      where: { id: commentId },
+    });
+
+    if (!comment) {
+      throw new NotFoundException('Comentário não encontrado');
+    }
+
+    if (comment.authorId !== authorId) {
+      throw new BadRequestException(
+        'Você não tem permissão para deletar este comentário',
+      );
+    }
+
+    // Deletar recursivamente todos os comentários filhos
+    await this.deleteCommentAndChildren(commentId);
+  }
+ 
+  private async deleteCommentAndChildren(commentId: number): Promise<void> {
+    // Buscar todos os comentários filhos
+    const childComments = await this.commentsRepository.find({
+      where: { parentCommentId: commentId },
+    });
+
+    // Deletar recursivamente cada comentário filho
+    for (const child of childComments) {
+      await this.deleteCommentAndChildren(child.id);
+    }
+
+    // Deletar o comentário atual
+    await this.commentsRepository.delete({ id: commentId });
+  }
 }
  

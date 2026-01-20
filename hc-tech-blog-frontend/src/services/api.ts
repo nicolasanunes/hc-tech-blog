@@ -1,7 +1,7 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios';
 import type { AuthResponse, RefreshTokenRequest } from '@/types/auth';
 import type { Tag } from '@/types/tag';
-import type { Article, PaginatedArticles, SearchArticlesParams } from '@/types/article';
+import type { Article, ArticleWithComments, PaginatedArticles, SearchArticlesParams } from '@/types/article';
 
 // Cria instância do axios com configuração base
 const api: AxiosInstance = axios.create({
@@ -147,6 +147,22 @@ export const searchArticles = async (params?: SearchArticlesParams): Promise<Pag
 export const createArticle = async (params: { title: string; content: string; tagIds: number[]; articlePicture?: string }): Promise<Article> => {
   const response = await api.post<Article>('/articles', params);
   return response.data;
+};
+
+// API de buscar artigo com comentários
+export const getArticleWithComments = async (id: string): Promise<ArticleWithComments> => {
+  const response = await api.get<ArticleWithComments>(`/articles/${id}/article-with-comments`);
+  return response.data;
+};
+
+// API de criar comentário
+export const createComment = async (params: { articleId: number; content: string; parentCommentId?: number }): Promise<void> => {
+  await api.post('/comments/create-comment-on-article', params);
+};
+
+// API de deletar comentário
+export const deleteComment = async (commentId: number): Promise<void> => {
+  await api.delete(`/comments/delete-comment/${commentId}`);
 };
 
 export default api;

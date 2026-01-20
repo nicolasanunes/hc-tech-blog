@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Param, Post, Request, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { CommentsService } from './comments.service';
 import { ListCommentsDto } from './dto/list-comments.dto';
@@ -18,5 +18,16 @@ export class CommentsController {
       createCommentOnArticleDto,
       req.user.id,
     );
+  }
+
+  @Delete('delete-comment/:id')
+  @UseGuards(AuthGuard('jwt'))
+  async deleteComment(
+    @Request() req: any,  
+    @Param('id') commentId: number,
+  ): Promise<void> {
+    console.log('Deleting comment with ID:', commentId);
+    console.log('Requesting user ID:', req.user.id);
+    return this.commentsService.deleteComment(commentId, req.user.id);
   }
 }
