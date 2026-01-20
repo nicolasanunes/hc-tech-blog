@@ -60,3 +60,18 @@ export interface CreateArticleParams {
   tagIds: number[];
   articlePicture?: string;
 }
+
+export interface ListArticleByid {
+  id: number;
+  title: string;
+  content: string;
+  articlePicture: string;
+  tags: Tag[];
+}
+
+export interface UpdateArticleParams {
+  title?: string;
+  content?: string;
+  tagIds?: number[];
+  articlePicture?: string;
+}

@@ -129,8 +129,8 @@ const toggleTag = (tagId: number) => {
     </RouterLink>
 
     <div class="grid grid-cols-1 gap-4">
-      <div v-for="article in articlesArray?.data" :key="article.id">
-        <div class="flex flex-row" @click="$router.push(`/articles/${article.id}`)">
+      <div v-for="article in articlesArray?.data" :key="article.id" class="relative">
+        <div class="flex flex-row mr-6" @click="$router.push(`/articles/${article.id}`)">
           <div class="flex-shrink-0 mr-4">
             <img
               v-if="article.articlePicture"
@@ -146,7 +146,7 @@ const toggleTag = (tagId: number) => {
             />
           </div>
           <div>
-            <div class="mr-4">
+            <div>
               <p class="inline font-bold">{{ article.title }}</p>
               <span
                 v-for="tag in article.tags"
@@ -160,7 +160,9 @@ const toggleTag = (tagId: number) => {
               </p>
             </div>
           </div>
-          <div v-if="authStore.user?.id === article.author.id" class="ml-auto">
+        </div>
+        <div v-if="authStore.user?.id === article.author.id" class="absolute top-0 right-0">
+          <button @click="$router.push(`/edit-article/${article.id}`)">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -176,7 +178,7 @@ const toggleTag = (tagId: number) => {
               <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
               <path d="M18.375 2.625a2.121 2.121 0 1 1 3 3L12 15l-4 1 1-4Z" />
             </svg>
-          </div>
+          </button>
         </div>
       </div>
       <div v-if="articlesArray?.total === 0" class="text-center text-gray-600 flex flex-col items-center">

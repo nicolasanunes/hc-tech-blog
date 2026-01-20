@@ -32,6 +32,12 @@ const routes = [
     component: () => import('../views/CreateArticleView.vue'),
     meta: { title: 'Criar Artigo', requiresAuth: true },
   },
+  {
+    path: '/edit-article/:id',
+    name: 'edit-article',
+    component: () => import('../views/EditArticleView.vue'),
+    meta: { title: 'Editar Artigo', requiresAuth: true },
+  },
 ]
 
 const router = createRouter({

@@ -149,9 +149,21 @@ export const createArticle = async (params: { title: string; content: string; ta
   return response.data;
 };
 
+// API de buscar artigo
+export const getArticle = async (id: string | number): Promise<Article> => {
+  const response = await api.get<Article>(`/articles/${id}`);
+  return response.data;
+};
+
 // API de buscar artigo com comentários
 export const getArticleWithComments = async (id: string): Promise<ArticleWithComments> => {
   const response = await api.get<ArticleWithComments>(`/articles/${id}/article-with-comments`);
+  return response.data;
+};
+
+// API de editar artigo
+export const updateArticle = async (id: string | number, params: { title: string; content: string; tagIds: number[]; articlePicture?: string }): Promise<Article> => {
+  const response = await api.patch<Article>(`/articles/${id}`, params);
   return response.data;
 };
 
