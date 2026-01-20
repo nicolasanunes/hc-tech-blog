@@ -36,8 +36,6 @@ export const useAuthStore = defineStore('auth', () => {
       const response = await api.post<AuthResponse>('/auth', credentials)
       const data = response.data
 
-      console.log('Login response data:', data)
-
       // Armazena no state
       user.value = data.user
       accessToken.value = data.accessToken

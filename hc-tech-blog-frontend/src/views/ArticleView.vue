@@ -81,6 +81,14 @@ const getDaysAgo = (dateString: string): string => {
   return `${diffInDays}d`
 }
 
+const formatDate = (dateString: string): string => {
+  const date = new Date(dateString)
+  const day = String(date.getDate()).padStart(2, '0')
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const year = date.getFullYear()
+  return `${day}/${month}/${year}`
+}
+
 const createComment = async () => {
   if (!content.value.trim() || !article.value) return
 
@@ -143,11 +151,22 @@ const deleteComment = async (commentId: string) => {
 
 <template>
   <div class="flex flex-col gap-2">
-    <p class="text-4xl font-semibold mb-2">{{ article?.article.title }}</p>
-    <p class="text-gray-600">Publicado por {{ article?.article.author.name }} · {{ article?.article.createdAt ? new Date(article.article.createdAt).toLocaleDateString() : '' }}</p>
-    <div class="flex flex-wrap gap-2 mb-2">
+    <!-- Mobile: título sozinho -->
+    <p class="text-4xl font-semibold mb-2 lg:hidden">{{ article?.article.title }}</p>
+
+    <!-- Desktop: título e tags na mesma linha -->
+    <div class="hidden lg:flex lg:flex-row lg:items-center lg:flex-wrap lg:gap-2 lg:mb-2">
+      <p class="text-4xl font-semibold">{{ article?.article.title }}</p>
       <div v-for="tag in article?.article.tags" :key="tag.id" class="bg-input-color border border-button-color text-black px-3 py-1 rounded-full text-sm select-none">{{ tag.name }}</div>
     </div>
+
+    <p class="text-gray-600">Publicado por {{ article?.article.author.name }} · {{ article?.article.createdAt ? formatDate(article.article.createdAt) : '' }}</p>
+
+    <!-- Mobile: tags abaixo da data -->
+    <div class="flex flex-wrap gap-2 mb-2 lg:hidden">
+      <div v-for="tag in article?.article.tags" :key="tag.id" class="bg-input-color border border-button-color text-black px-3 py-1 rounded-full text-sm select-none">{{ tag.name }}</div>
+    </div>
+
     <p class="mb-2">{{ article?.article.content }}</p>
     <p class="font-semibold">Comentários</p>
     <textarea

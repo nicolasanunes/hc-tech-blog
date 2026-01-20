@@ -26,8 +26,6 @@ export class CommentsController {
     @Request() req: any,  
     @Param('id') commentId: number,
   ): Promise<void> {
-    console.log('Deleting comment with ID:', commentId);
-    console.log('Requesting user ID:', req.user.id);
     return this.commentsService.deleteComment(commentId, req.user.id);
   }
 }

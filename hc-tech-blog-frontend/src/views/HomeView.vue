@@ -6,9 +6,9 @@ const authStore = useAuthStore()
 
 <template>
   <div class="flex flex-col h-full justify-center text-center items-center gap-4">
-    <p class="text-5xl font-bold">Insights & Learning</p>
+    <p class="text-5xl font-bold lg:text-6xl">Insights & Learning</p>
     <p>
-      Exporando tendências Tech, <br />
+      Exporando tendências Tech, <br class="md:hidden"/>
       um post por vez
     </p>
     <RouterLink

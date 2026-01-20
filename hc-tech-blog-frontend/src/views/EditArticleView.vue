@@ -176,7 +176,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-2">
+  <div class="flex flex-col gap-2 lg:relative">
     <ApiMessage
       :error-message="errorMessage"
       :loading-message="authStore.loading ? 'Editando...' : undefined"
@@ -257,8 +257,10 @@ onMounted(() => {
       placeholder="Escreva aqui seu artigo..."
       :disabled="authStore.loading"
     ></textarea>
-    <p v-if="!isFormValid" class="text-red-500 text-xs">Preencha todas as informações obrigatórias *</p>
-    <button class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50" @click="editArticle" :disabled="!isFormValid || authStore.loading || loading">Editar artigo</button>
+    <div class="flex flex-col lg:flex-row lg:justify-end lg:items-center lg:gap-2 lg:absolute lg:top-0 lg:right-0">
+      <p v-if="!isFormValid" class="text-red-500 text-xs lg:order-1">Preencha todas as informações obrigatórias *</p>
+      <button class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50 lg:order-2" @click="editArticle" :disabled="!isFormValid || authStore.loading || loading">Salvar</button>
+    </div>
   </div>
 </template>
 

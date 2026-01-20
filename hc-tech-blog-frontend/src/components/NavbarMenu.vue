@@ -13,7 +13,7 @@ const handleLogout = async () => {
 </script>
 
 <template>
-  <div class="flex justify-between items-center p-6 border-b border-gray-300">
+  <div class="flex justify-between items-center p-4 border-b border-gray-300">
     <RouterLink :to="authStore.isAuthenticated ? '/articles' : '/'" class="font-bold text-xl">TechBlog</RouterLink>
 
     <button

@@ -40,7 +40,7 @@ const handleLogin = async () => {
 </script>
 
 <template>
-  <div class="flex flex-col h-full justify-center gap-2">
+  <div class="flex flex-col h-full justify-center gap-2 md:w-2/3 xl:w-2/4 md:mx-auto">
     <ApiMessage
       :error-message="errorMessage"
       :loading-message="authStore.loading ? 'Autenticando...' : undefined"

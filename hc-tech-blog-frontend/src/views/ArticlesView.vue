@@ -103,14 +103,18 @@ const toggleTag = (tagId: number) => {
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <input
-      type="text"
-      v-model="searchTitle"
-      class="bg-input-color rounded-xl px-4 py-2 text-button-color mb-2"
-      placeholder="Pesquisar"
-    />
-    <div class="flex flex-wrap gap-2 mb-4">
+  <div class="flex flex-col lg:relative">
+    <p class="hidden text-4xl font-semibold lg:flex">Todos os artigos</p>
+    <!-- Botão criar artigo - mobile abaixo das tags, desktop no canto superior direito -->
+    <RouterLink
+      to="/create-article"
+      class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4 order-3 lg:order-1 lg:absolute lg:top-0 lg:right-0 lg:mb-0"
+    >
+      Criar artigo
+    </RouterLink>
+
+    <!-- Tags - mobile abaixo do input, desktop acima -->
+    <div class="flex flex-wrap gap-2 mb-4 order-2 lg:order-1 lg:mb-2 lg:pt-3">
       <div
         v-for="tag in tagsArray"
         :key="tag.id"
@@ -124,11 +128,15 @@ const toggleTag = (tagId: number) => {
       </div>
     </div>
 
-    <RouterLink to="/create-article" class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4">
-      Criar artigo
-    </RouterLink>
+    <!-- Input de pesquisa - mobile no topo, desktop abaixo das tags -->
+    <input
+      type="text"
+      v-model="searchTitle"
+      class="bg-input-color rounded-xl px-4 py-2 text-button-color mb-2 order-1 lg:order-2 lg:mb-4"
+      placeholder="Pesquisar"
+    />
 
-    <div class="grid grid-cols-1 gap-4">
+    <div class="grid grid-cols-1 gap-4 order-3">
       <div v-for="article in articlesArray?.data" :key="article.id" class="relative">
         <div class="flex flex-row mr-6" @click="$router.push(`/articles/${article.id}`)">
           <div class="flex-shrink-0 mr-4">
@@ -145,19 +153,36 @@ const toggleTag = (tagId: number) => {
               class="w-22 h-22 object-cover rounded-xl"
             />
           </div>
-          <div>
-            <div>
-              <p class="inline font-bold">{{ article.title }}</p>
+          <div class="flex flex-col">
+            <!-- Em mobile, título e tags na mesma linha, inline -->
+            <div class="lg:hidden">
+              <span class="font-bold inline mr-1">{{ article.title }}</span>
               <span
                 v-for="tag in article.tags"
                 :key="tag.id"
-                class="inline-block bg-input-color text-xs px-1 rounded-xl ml-1"
+                class="inline-block bg-input-color text-xs px-1 rounded-xl"
               >
                 {{ tag.name }}
               </span>
-              <p class="text-gray-600 text-sm line-clamp-2">
-                {{ article.content }}
-              </p>
+            </div>
+
+            <!-- Em desktop, título sozinho -->
+            <p class="font-bold hidden lg:block">{{ article.title }}</p>
+
+            <!-- Em ambas as resoluções, content -->
+            <p class="text-gray-600 text-sm line-clamp-1 lg:line-clamp-2 lg:mb-1">
+              {{ article.content }}
+            </p>
+
+            <!-- Em desktop, tags abaixo do content -->
+            <div class="hidden lg:flex flex-wrap gap-1">
+              <span
+                v-for="tag in article.tags"
+                :key="tag.id"
+                class="bg-input-color text-xs px-1 rounded-xl"
+              >
+                {{ tag.name }}
+              </span>
             </div>
           </div>
         </div>
@@ -202,7 +227,7 @@ const toggleTag = (tagId: number) => {
         Nenhum artigo encontrado
       </div>
     </div>
-    <nav v-if="articlesArray" class="flex justify-center items-center gap-2 mt-4">
+    <nav v-if="articlesArray" class="flex justify-center items-center gap-2 mt-4 order-4">
       <span v-for="pageNum in articlesArray.totalPages" :key="pageNum">
         <button
           @click="changePage(pageNum)"

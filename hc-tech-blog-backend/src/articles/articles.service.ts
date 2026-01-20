@@ -117,7 +117,7 @@ export class ArticlesService {
   async searchArticles(
     searchArticlesDto: SearchArticlesDto,
   ): Promise<PaginatedArticlesDto> {
-    const { title, tagIds, page = 1, limit = 5 } = searchArticlesDto;
+    const { title, tagIds, page = 1, limit = 6 } = searchArticlesDto;
 
     const queryBuilder = this.articleRepository
       .createQueryBuilder('article')

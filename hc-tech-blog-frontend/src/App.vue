@@ -8,7 +8,7 @@ import NavbarMenu from './components/NavbarMenu.vue';
     <header>
       <NavbarMenu />
     </header>
-    <main class="flex-1 px-6 py-6">
+    <main class="flex-1 px-4 py-4 md:px-8 lg:px-16 xl:px-32 2xl:px-64">
       <RouterView />
     </main>
   </div>
