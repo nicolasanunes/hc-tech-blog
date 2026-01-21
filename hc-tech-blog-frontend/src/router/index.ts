@@ -51,7 +51,11 @@ router.beforeEach(async (to, from, next) => {
 
   // Se não está autenticado, tenta restaurar a sessão do cookie
   if (!authStore.isAuthenticated) {
-    await authStore.checkAuth()
+    if (to.meta.requiresAuth) {
+      await authStore.checkAuth()
+    } else {
+      await authStore.checkAuth(true)
+    }
   }
 
   const requiresAuth = to.meta.requiresAuth

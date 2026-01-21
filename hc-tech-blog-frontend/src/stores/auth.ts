@@ -12,7 +12,8 @@ export const useAuthStore = defineStore('auth', () => {
   const currentUser = computed(() => user.value)
 
   // Verifica se o usuário está autenticado (token está nos cookies)
-  const checkAuth = async (): Promise<boolean> => {
+  // Se suppressError for true, não exibe erro no console (para as rotas / e /login)
+  const checkAuth = async (suppressError = false): Promise<boolean> => {
     try {
       // Chama endpoint /me para obter dados do usuário, o backend irá ler o cookie automaticamente
       const response = await api.get<User>('/auth/me')
@@ -22,7 +23,9 @@ export const useAuthStore = defineStore('auth', () => {
       }
       return false
     } catch (err) {
-      console.error('Erro ao verificar autenticação:', err)
+      if (!suppressError) {
+        console.error('Erro ao verificar autenticação:', err)
+      }
       user.value = null
       return false
     }
