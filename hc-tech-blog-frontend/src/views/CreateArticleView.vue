@@ -77,7 +77,7 @@ const createArticle = async () => {
 
     successMessage.value = 'Artigo criado com sucesso!'
 
-    // Aguarda um pouco para mostrar a mensagem antes de redirecionar
+    // Aguarda 1 segundo para mostrar a mensagem antes de redirecionar
     setTimeout(() => {
       router.push('/articles')
     }, 1000)
@@ -190,7 +190,7 @@ onMounted(() => {
         :key="tag.id"
         @click="toggleTag(tag.id)"
         :class="[
-          'bg-input-color text-black px-3 py-1 rounded-full text-sm select-none',
+          'bg-input-color text-black px-3 py-1 rounded-full text-sm select-none cursor-pointer hover:opacity-80 transition-colors',
           selectedTagIds.includes(tag.id) ? 'border border-button-color text-button-color' : '',
         ]"
       >
@@ -200,7 +200,7 @@ onMounted(() => {
         v-for="(tagName, index) in pendingTags"
         :key="'pending-' + index"
         @click="removePendingTag(tagName)"
-        class="bg-red-100 border border-red-600 text-black px-3 py-1 rounded-full text-sm select-none flex items-center gap-1"
+        class="bg-red-100 border border-red-600 text-black px-3 py-1 rounded-full text-sm select-none flex items-center gap-1 cursor-pointer hover:opacity-80 transition-colors"
       >
         <span class="font-bold text-red-600">×</span>
         {{ tagName }}
@@ -208,7 +208,7 @@ onMounted(() => {
       <div
         v-if="!isCreatingNewTag"
         @click="startCreatingTag"
-        class="text-black px-3 py-1 rounded-full text-sm select-none border bg-button-color text-white"
+        class="text-black px-3 py-1 rounded-full text-sm select-none border bg-button-color text-white cursor-pointer hover:opacity-80 transition-colors"
       >
         + adicionar
       </div>
@@ -242,7 +242,7 @@ onMounted(() => {
         Preencha todas as informações obrigatórias *
       </p>
       <button
-        class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50 lg:order-2"
+        class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50 lg:order-2 cursor-pointer shadow-lg hover:opacity-80 transition-colors"
         @click="createArticle"
         :disabled="!isFormValid || authStore.loading || loading"
       >

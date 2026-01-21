@@ -4,13 +4,14 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Response } from 'express';
 import { LoginDto } from './dto/login.dto';
-import { ListLoginDto, LoginPayloadDto } from './dto/list-login.dto';
+import { LoginPayloadDto } from './dto/list-login.dto';
 import { UsersService } from 'src/users/users.service';
 import { User } from 'src/users/entities/user.entity';
 import { validatePassword } from 'src/utils/password';
-import { RefreshTokenDto } from './dto/refresh-token.dto';
-
+import { ListAuthUserDto } from 'src/users/dto/list-user.dto';
+ 
 @Injectable()
 export class AuthService {
   constructor(
@@ -18,7 +19,10 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async login(loginDto: LoginDto): Promise<ListLoginDto> {
+  async login(
+    loginDto: LoginDto,
+    response: Response,
+  ): Promise<{ user: ListAuthUserDto }> {
     const user: User | undefined = await this.usersService
       .listUserByEmail(loginDto.email)
       .catch(() => undefined);
@@ -37,9 +41,26 @@ export class AuthService {
       email: user.email,
     };
 
+    const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
+    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+
+    // Define o accessToken como HttpOnly
+    response.cookie('accessToken', accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 15 * 60 * 1000, // 15 minutos
+    });
+
+    // Define o refreshToken como HttpOnly
+    response.cookie('refreshToken', refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 dias
+    });
+
     return {
-      accessToken: this.jwtService.sign(payload, { expiresIn: '15m' }),
-      refreshToken: this.jwtService.sign(payload, { expiresIn: '7d' }),
       user: {
         id: user.id,
         name: user.name,
@@ -48,12 +69,14 @@ export class AuthService {
     };
   }
 
-  async refreshToken(refreshToken: RefreshTokenDto): Promise<ListLoginDto> {
+  async refreshToken(
+    refreshTokenValue: string,
+    response: Response,
+  ): Promise<{ message: string }> {
     try {
       // Verifica e decodifica o refresh token
-      const payload = this.jwtService.verify<LoginPayloadDto>(
-        refreshToken.refreshToken,
-      );
+      const payload =
+        this.jwtService.verify<LoginPayloadDto>(refreshTokenValue);
 
       // Valida se o usuário existe e está ativo
       const user: User = await this.usersService.findUserById(payload.id);
@@ -67,18 +90,29 @@ export class AuthService {
         email: user.email,
       };
 
-      // Gera novos tokens
-      return {
-        accessToken: this.jwtService.sign(newPayload, { expiresIn: '15m' }),
-        refreshToken: this.jwtService.sign(newPayload, { expiresIn: '7d' }),
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-        },
-      };
+      // Gera novo access token
+      const newAccessToken = this.jwtService.sign(newPayload, {
+        expiresIn: '15m',
+      });
+
+      // Atualiza apenas o access token
+      response.cookie('accessToken', newAccessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 15 * 60 * 1000,
+      });
+
+      return { message: 'Token atualizado com sucesso' };
     } catch (error) {
       throw new UnauthorizedException('Refresh token inválido ou expirado');
     }
   }
+
+  logout(response: Response): string {
+    response.clearCookie('accessToken');
+    response.clearCookie('refreshToken');
+    return 'Logout realizado com sucesso';
+  }
 }
+ 

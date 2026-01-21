@@ -45,12 +45,13 @@ const router = createRouter({
   routes,
 })
 
-// Navigation guard: protege rotas que precisam de autenticação
+// Protege rotas que precisam de autenticação
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore()
 
-  if (!authStore.accessToken) {
-    authStore.initializeAuth()
+  // Se não está autenticado, tenta restaurar a sessão do cookie
+  if (!authStore.isAuthenticated) {
+    await authStore.checkAuth()
   }
 
   const requiresAuth = to.meta.requiresAuth

@@ -14,12 +14,14 @@ const handleLogout = async () => {
 
 <template>
   <div class="flex justify-between items-center p-4 border-b border-gray-300">
-    <RouterLink :to="authStore.isAuthenticated ? '/articles' : '/'" class="font-bold text-xl">TechBlog</RouterLink>
+    <RouterLink :to="authStore.isAuthenticated ? '/articles' : '/'" class="font-bold text-xl"
+      >TechBlog</RouterLink
+    >
 
     <button
       v-if="authStore.isAuthenticated && route.path !== '/login' && route.path !== '/'"
       @click="handleLogout"
-      class="bg-input-color rounded-xl p-2 text-sm"
+      class="bg-input-color rounded-xl p-2 text-sm cursor-pointer hover:opacity-80 transition-colors"
       title="Sair"
     >
       <svg

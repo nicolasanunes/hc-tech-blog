@@ -35,7 +35,7 @@ export class ArticlesService {
   ): Promise<ListArticleDto> {
     const { title, content, articlePicture, tagIds } = createArticleDto;
 
-    // Valida se as tags existem
+    // Valida se as tags existem antes de criar o artigo
     if (tagIds && tagIds.length > 0) {
       const tags = await this.tagRepository.find({
         where: { id: In(tagIds) },
@@ -46,7 +46,7 @@ export class ArticlesService {
       }
     }
 
-    // Cria o artigo
+    // Cria o artigo no banco de dados
     const newArticle = this.articleRepository.create({
       title,
       content,
@@ -56,7 +56,7 @@ export class ArticlesService {
 
     const savedArticle = await this.articleRepository.save(newArticle);
 
-    // Associa as tags
+    // Associa as tags ao artigo criado
     if (tagIds && tagIds.length > 0) {
       const tags = await this.tagRepository.find({
         where: { id: In(tagIds) },
@@ -251,7 +251,7 @@ export class ArticlesService {
 
     const { title, content, articlePicture, tagIds } = updateArticleDto;
 
-    // Atualiza os campos e != de undefined
+    // Atualiza os campos se diferente de undefined
     if (title !== undefined) article.title = title;
     if (content !== undefined) article.content = content;
     if (articlePicture !== undefined) article.articlePicture = articlePicture;
@@ -305,3 +305,4 @@ export class ArticlesService {
     };
   }
 }
+ 

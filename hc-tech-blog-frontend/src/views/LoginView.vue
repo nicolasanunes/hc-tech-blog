@@ -29,7 +29,7 @@ const handleLogin = async () => {
 
     successMessage.value = 'Login realizado com sucesso!'
 
-    // Aguarda um pouco para mostrar a mensagem antes de redirecionar
+    // Aguarda 1 segundo para mostrar a mensagem antes de redirecionar
     setTimeout(() => {
       router.push('/articles')
     }, 1000)
@@ -72,7 +72,7 @@ const handleLogin = async () => {
     />
 
     <button
-      class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50"
+      class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold disabled:opacity-50 cursor-pointer shadow-lg hover:opacity-80 transition-colors"
       :disabled="authStore.loading"
       @click="handleLogin"
     >

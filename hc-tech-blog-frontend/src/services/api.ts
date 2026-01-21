@@ -1,5 +1,4 @@
-import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
-import type { AuthResponse, RefreshTokenRequest } from '@/types/auth'
+import axios, { type AxiosInstance } from 'axios'
 import type { Tag } from '@/types/tag'
 import type {
   Article,
@@ -14,45 +13,30 @@ const api: AxiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
+  withCredentials: true, // Envia cookies automaticamente
   paramsSerializer: {
     indexes: null, // Para arrays: ?tagIds=1&tagIds=2 ao invés de ?tagIds[0]=1&tagIds[1]=2
   },
 })
 
-// Flag para prevenir múltiplas tentativas de refresh simultâneas (se várias abas abertas com o token expirado, trata para não ter várias chamadas simultâneas)
+// Flag para prevenir múltiplas tentativas de refresh simultâneas
 let isRefreshing = false
 let failedQueue: Array<{
   resolve: (value?: unknown) => void
   reject: (reason?: unknown) => void
 }> = []
 
-const processQueue = (error: Error | null, token: string | null = null) => {
+const processQueue = (error: Error | null) => {
   failedQueue.forEach((prom) => {
     if (error) {
       prom.reject(error)
     } else {
-      prom.resolve(token)
+      prom.resolve()
     }
   })
 
   failedQueue = []
 }
-
-// Interceptor de requisição: adiciona o access token automaticamente no header
-api.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const accessToken = localStorage.getItem('accessToken')
-
-    if (accessToken && config.headers) {
-      config.headers.Authorization = `Bearer ${accessToken}`
-    }
-
-    return config
-  },
-  (error) => {
-    return Promise.reject(error)
-  },
-)
 
 // Interceptor de resposta: se erro 401, tenta dar refresh no token
 api.interceptors.response.use(
@@ -71,8 +55,7 @@ api.interceptors.response.use(
         return new Promise((resolve, reject) => {
           failedQueue.push({ resolve, reject })
         })
-          .then((token) => {
-            originalRequest.headers.Authorization = `Bearer ${token}`
+          .then(() => {
             return api(originalRequest)
           })
           .catch((err) => {
@@ -83,32 +66,12 @@ api.interceptors.response.use(
       originalRequest._retry = true
       isRefreshing = true
 
-      const refreshToken = localStorage.getItem('refreshToken')
-
-      if (!refreshToken) {
-        // Se não tem refresh token, redireciona para login
-        localStorage.clear()
-        window.location.href = '/login'
-        return Promise.reject(error)
-      }
-
       try {
-        // Tenta fazer refresh do token
-        const { data } = await axios.post<AuthResponse>(
-          `${api.defaults.baseURL}/auth/refresh-token`,
-          { refreshToken } as RefreshTokenRequest,
-        )
-
-        // Salva novos tokens no localStorage
-        localStorage.setItem('accessToken', data.accessToken)
-        localStorage.setItem('refreshToken', data.refreshToken)
-        localStorage.setItem('user', JSON.stringify(data.user))
-
-        // Atualiza header da requisição original
-        originalRequest.headers.Authorization = `Bearer ${data.accessToken}`
+        // Tenta fazer refresh do token (o refresh token está no cookie HttpOnly)
+        await api.post('/auth/refresh-token')
 
         // Processa fila de requisições pendentes
-        processQueue(null, data.accessToken)
+        processQueue(null)
 
         isRefreshing = false
 
@@ -116,10 +79,9 @@ api.interceptors.response.use(
         return api(originalRequest)
       } catch (refreshError) {
         // Refresh falhou, faz logout
-        processQueue(refreshError as Error, null)
+        processQueue(refreshError as Error)
         isRefreshing = false
 
-        localStorage.clear()
         window.location.href = '/login'
 
         return Promise.reject(refreshError)

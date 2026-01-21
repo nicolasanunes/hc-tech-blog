@@ -40,7 +40,7 @@ const fetchArticles = async () => {
       page: currentPage.value,
     }
 
-    // Adiciona title se houver
+    // Adiciona title se houver texto de busca
     if (searchTitle.value.trim()) {
       searchParams.title = searchTitle.value.trim()
     }
@@ -108,7 +108,7 @@ const toggleTag = (tagId: number) => {
     <!-- Botão criar artigo - mobile abaixo das tags, desktop no canto superior direito -->
     <RouterLink
       to="/create-article"
-      class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4 order-3 lg:order-1 lg:absolute lg:top-0 lg:right-0 lg:mb-0"
+      class="rounded-xl bg-button-color text-white text-sm font-semibold self-start px-4 py-2 mb-4 order-3 lg:order-1 lg:absolute lg:top-0 lg:right-0 lg:mb-0 shadow-lg hover:opacity-80 transition-colors"
     >
       Criar artigo
     </RouterLink>
@@ -120,7 +120,7 @@ const toggleTag = (tagId: number) => {
         :key="tag.id"
         @click="toggleTag(tag.id)"
         :class="[
-          'bg-input-color text-black px-3 py-1 rounded-full text-sm cursor-pointer select-none',
+          'bg-input-color text-black px-3 py-1 rounded-full text-sm select-none cursor-pointer hover:opacity-80 transition-colors',
           selectedTagIds.includes(tag.id) ? 'border border-button-color text-button-color' : '',
         ]"
       >
@@ -137,7 +137,11 @@ const toggleTag = (tagId: number) => {
     />
 
     <div class="grid grid-cols-1 gap-4 order-3">
-      <div v-for="article in articlesArray?.data" :key="article.id" class="relative">
+      <div
+        v-for="article in articlesArray?.data"
+        :key="article.id"
+        class="relative rounded rounded-xl cursor-pointer hover:shadow-lg hover:transition-shadow hover:bg-gray-50"
+      >
         <div class="flex flex-row mr-6" @click="$router.push(`/articles/${article.id}`)">
           <div class="flex-shrink-0 mr-4">
             <img
@@ -187,7 +191,10 @@ const toggleTag = (tagId: number) => {
           </div>
         </div>
         <div v-if="authStore.user?.id === article.author.id" class="absolute top-0 right-0">
-          <button @click="$router.push(`/edit-article/${article.id}`)">
+          <button
+            class="cursor-pointer hover:opacity-80 transition-colors"
+            @click="$router.push(`/edit-article/${article.id}`)"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               width="20"
@@ -235,7 +242,7 @@ const toggleTag = (tagId: number) => {
         <button
           @click="changePage(pageNum)"
           :class="[
-            'px-3 py-1 rounded-full',
+            'px-3 py-1 rounded-full cursor-pointer hover:opacity-80 transition-colors',
             isCurrentPage(pageNum) ? 'bg-input-color font-bold' : '',
           ]"
         >

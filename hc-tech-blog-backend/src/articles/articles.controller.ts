@@ -26,7 +26,7 @@ import { UpdateArticleDto } from './dto/update-article.dto';
 export class ArticlesController {
   constructor(private readonly articlesService: ArticlesService) {}
 
-  @Post()
+  @Post() 
   @UseGuards(AuthGuard('jwt'))
   async createArticle(
     @Body() createArticleDto: CreateArticleDto,

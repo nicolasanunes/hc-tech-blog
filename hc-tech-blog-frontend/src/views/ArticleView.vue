@@ -8,6 +8,8 @@ import {
 } from '@/services/api'
 import type { ArticleWithComments } from '@/types/article'
 import { useAuthStore } from '@/stores/auth'
+import ConfirmExclusion from '@/components/ConfirmExclusion.vue'
+import ApiMessage from '@/components/ApiMessage.vue'
 
 const authStore = useAuthStore()
 
@@ -15,6 +17,13 @@ const content = ref<string>('')
 const replyingToCommentId = ref<string | null>(null)
 const replyContent = ref<string>('')
 const expandedComments = ref<Set<string>>(new Set())
+
+// Estado do modal de confirmação
+const isConfirmModalOpen = ref(false)
+const commentToDelete = ref<string | null>(null)
+
+const errorMessage = ref<string>('')
+const successMessage = ref<string>('')
 
 const route = useRoute()
 const loading = ref(false)
@@ -140,23 +149,49 @@ const sendReply = async (parentCommentId: string) => {
   }
 }
 
-const deleteComment = async (commentId: string) => {
-  if (!confirm('Tem certeza que deseja deletar este comentário?')) {
-    return
-  }
+const openDeleteModal = (commentId: string) => {
+  commentToDelete.value = commentId
+  isConfirmModalOpen.value = true
+}
+
+const cancelDelete = () => {
+  isConfirmModalOpen.value = false
+  commentToDelete.value = null
+}
+
+const confirmDelete = async () => {
+  if (!commentToDelete.value) return
+
+  errorMessage.value = ''
+  successMessage.value = ''
 
   try {
-    await deleteCommentApi(Number(commentId))
+    await deleteCommentApi(Number(commentToDelete.value))
+    successMessage.value = 'Comentário excluído com sucesso!'
+
+    setTimeout(() => {
+      successMessage.value = ''
+    }, 1000)
+
     await fetchArticleWithComments()
   } catch (err: any) {
-    error.value = err.response?.data?.message || 'Erro ao deletar comentário'
+    errorMessage.value = err.response?.data?.message || 'Erro ao deletar comentário'
     console.error('Erro ao deletar comentário:', err)
+
+    setTimeout(() => {
+      errorMessage.value = ''
+    }, 1000)
+  } finally {
+    isConfirmModalOpen.value = false
+    commentToDelete.value = null
   }
 }
 </script>
 
 <template>
   <div class="flex flex-col gap-2">
+    <ApiMessage :error-message="errorMessage" :success-message="successMessage" />
+
     <!-- Mobile: título sozinho -->
     <p class="text-4xl font-semibold mb-2 lg:hidden">{{ article?.article.title }}</p>
 
@@ -199,7 +234,7 @@ const deleteComment = async (commentId: string) => {
       :disabled="authStore.loading"
     ></textarea>
     <button
-      class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold self-start disabled:opacity-50 mb-2"
+      class="bg-button-color rounded-xl px-4 py-2 text-white text-sm font-semibold self-start disabled:opacity-50 mb-2 shadow-lg hover:opacity-80 transition-colors cursor-pointer"
       @click="createComment"
       :disabled="authStore.loading"
     >
@@ -229,7 +264,7 @@ const deleteComment = async (commentId: string) => {
               <p>
                 {{ comment.content }}
               </p>
-              <div>
+              <div class="cursor-pointer hover:opacity-80 transition-colors">
                 <svg
                   @click="startReply(comment.id, comment.author.name)"
                   xmlns="http://www.w3.org/2000/svg"
@@ -241,7 +276,7 @@ const deleteComment = async (commentId: string) => {
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="lucide lucide-reply-icon lucide-reply text-gray-600 cursor-pointer"
+                  class="lucide lucide-reply-icon lucide-reply text-gray-600"
                 >
                   <path d="M20 18v-2a4 4 0 0 0-4-4H4" />
                   <path d="m9 17-5-5 5-5" />
@@ -249,9 +284,12 @@ const deleteComment = async (commentId: string) => {
               </div>
             </div>
           </div>
-          <div v-if="authStore.user?.id === comment.author.id" class="ml-auto">
+          <div
+            v-if="authStore.user?.id === comment.author.id"
+            class="ml-auto cursor-pointer hover:opacity-80 transition-colors"
+          >
             <svg
-              @click="deleteComment(comment.id)"
+              @click="openDeleteModal(comment.id)"
               xmlns="http://www.w3.org/2000/svg"
               width="20"
               height="20"
@@ -261,7 +299,7 @@ const deleteComment = async (commentId: string) => {
               stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              class="lucide lucide-trash2-icon lucide-trash-2 text-gray-600 cursor-pointer"
+              class="lucide lucide-trash2-icon lucide-trash-2 text-gray-600"
             >
               <path d="M10 11v6" />
               <path d="M14 11v6" />
@@ -282,7 +320,10 @@ const deleteComment = async (commentId: string) => {
             :disabled="authStore.loading"
           ></textarea>
           <div class="flex flex-col">
-            <button @click="cancelReply" class="bg-red-500 text-white rounded-tr-xl px-2 py-2">
+            <button
+              @click="cancelReply"
+              class="bg-red-500 text-white rounded-tr-xl px-2 py-2 cursor-pointer hover:opacity-80 transition-colors"
+            >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="20"
@@ -302,7 +343,7 @@ const deleteComment = async (commentId: string) => {
             </button>
             <button
               @click="sendReply(comment.id)"
-              class="bg-button-color rounded-br-xl px-2 py-2 text-white disabled:opacity-50"
+              class="bg-button-color rounded-br-xl px-2 py-2 text-white disabled:opacity-50 cursor-pointer hover:opacity-80 transition-colors"
               :disabled="authStore.loading || !replyContent.trim()"
             >
               <svg
@@ -362,9 +403,12 @@ const deleteComment = async (commentId: string) => {
                   </p>
                 </div>
               </div>
-              <div v-if="authStore.user?.id === childComment.author.id" class="ml-auto">
+              <div
+                v-if="authStore.user?.id === childComment.author.id"
+                class="ml-auto cursor-pointer hover:opacity-80 transition-colors"
+              >
                 <svg
-                  @click="deleteComment(childComment.id)"
+                  @click="openDeleteModal(childComment.id)"
                   xmlns="http://www.w3.org/2000/svg"
                   width="20"
                   height="20"
@@ -374,7 +418,7 @@ const deleteComment = async (commentId: string) => {
                   stroke-width="2"
                   stroke-linecap="round"
                   stroke-linejoin="round"
-                  class="lucide lucide-trash2-icon lucide-trash-2 text-gray-600 cursor-pointer"
+                  class="lucide lucide-trash2-icon lucide-trash-2 text-gray-600"
                 >
                   <path d="M10 11v6" />
                   <path d="M14 11v6" />
@@ -390,7 +434,7 @@ const deleteComment = async (commentId: string) => {
           <button
             v-if="hasHiddenReplies(comment.id)"
             @click="showAllReplies(comment.id)"
-            class="text-button-color text-sm font-semibold mt-2 hover:underline"
+            class="text-button-color text-sm font-semibold mt-2 hover:underline cursor-pointer hover:opacity-80 transition-colors"
           >
             Ver mais comentários
           </button>
@@ -398,6 +442,14 @@ const deleteComment = async (commentId: string) => {
       </div>
     </div>
   </div>
+  <!-- Modal de confirmação de exclusão -->
+  <ConfirmExclusion
+    :is-open="isConfirmModalOpen"
+    title="Excluir comentário"
+    message="Tem certeza que deseja excluir este comentário? Esta ação não pode ser desfeita."
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+  />
 </template>
 
 <style></style>
