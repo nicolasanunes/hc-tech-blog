@@ -11,13 +11,12 @@ O Tech Blog foi idealizado para ser uma plataforma de publicação de artigos e 
 - **Docker:** Uso de Docker Compose para facilitar o setup do banco de dados MySQL em docker.
 
 ## Organização do Código
- - **hc-tech-blog-backend/**
-   - `src/`
-     - `articles/`, `comments/`, `tags/`, `users/`: Cada domínio possui controller, service, DTOs e entidades, seguindo o padrão modular do NestJS.
-     - `db/`: Configuração do banco de dados e migrations.
-     - `auth/`: Lida com autenticação, login e refresh token.
-     - `utils/`: Funções utilitárias, como hash de senhas.
-
+- **hc-tech-blog-backend/**
+  - `src/`
+    - `articles/`, `comments/`, `tags/`, `users/`: Cada domínio possui controller, service, DTOs e entidades, seguindo o padrão modular do NestJS.
+    - `db/`: Configuração do banco de dados e migrations.
+    - `auth/`: Lida com autenticação, login e refresh token.
+    - `utils/`: Funções utilitárias, como hash de senhas.
 - **hc-tech-blog-frontend/**
   - `src/` 
     - `components/`: Componentes reutilizáveis (Navbar, mensagens, confirmações).
